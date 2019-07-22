@@ -25,6 +25,7 @@ app.use(morgan('combined'));
 // retreive questions
 
 app.get('/', (req, res) => {
+    console.log('retreiving questions');
     const qs = questions.map(q => ({
         id: q.id,
         title: q.title,
@@ -45,6 +46,7 @@ app.get('/:id', (req, res) => {
 
 // insert a new question
 app.post('/', (req, res) => {
+    console.log('posting question');
     const {title, description} = req.body;
     const newQuestion = {
         id: questions.length + 1,
@@ -57,17 +59,19 @@ app.post('/', (req, res) => {
 });
 
 // insert a new answer to a question
-app.post('answer/:id', (req, res) => {
+app.post('/answer/:id', (req, res) => {
     const {answer} = req.body;
-    const question = questions.filter(q => (q.id == parseInt(req.params.id)));
+  
+    const question = questions.filter(q => (q.id === parseInt(req.params.id)));
     if (question.length > 1) return res.status(500).send();
     if (question.length === 0) return res.status(404).send();
-
+  
     question[0].answers.push({
-        answer
+      answer,
     });
+  
     res.status(200).send();
-});
+  });
 
 // start server
 app.listen(8081, () => {
