@@ -1,26 +1,27 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {Component} from 'react';
+import {Route} from 'react-router-dom';
+import Callback from './Callback';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import NavBar from './NavBar/NavBar';
+import Questions from './Questions/Questions';
+import Question from './Question/Question';
+import NewQuestion from './NewQuestion/NewQuestion';
+import SecuredRoute from './SecuredRoute/SecuredRoute';
+
+
+
+class App extends Component {
+  render () {
+    return (
+      <div>
+          <NavBar/>
+          <Route exact path='/' component={Questions}/>
+          <Route exact path='/question/:questionId' component={Question}/>
+          <Route exact path='/callback' component={Callback}/>
+          <SecuredRoute path='/new-question' component={NewQuestion} />
+      </div>
+    );
+  }
 }
 
 export default App;
