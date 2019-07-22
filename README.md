@@ -1,3 +1,3 @@
-Run the server by running `node src` from the backend folder.
+Start the server by running `node src` from the backend folde.
 
-Run 
+Run `npm start` from the frontend folder to start the react app.
