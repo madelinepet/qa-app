@@ -34,24 +34,9 @@ const pool = new Pool({
   host: 'localhost',
   database: 'qa_backend',
   port: 5432,
-})
-
-// db setup
-  // create table questions (
-  //   ID SERIAL PRIMARY KEY,
-  // title VARCHAR(30),
-  // description VARCHAR(100),
-  // answers text[]
-  // );
-  // create table answers (
-  //   answer_id SERIAL PRIMARY KEY,
-  //   ID integer references questions,
-  //   answer_content text
-  // );
-  
+})  
 
 // retreive questions
-
 app.get('/', (req, res) => {
   pool.query('SELECT * FROM questions', (error, results) => {
     if(error) {
@@ -69,7 +54,6 @@ app.get('/:id', (req, res) => {
     if(error) {
       throw error;
     }
-    console.log('results', results.rows[0]);
     res.status(200).json(results.rows[0]);
   })
 });
@@ -82,7 +66,6 @@ app.get('/answer/:id', (req, res) => {
     if(error) {
       throw error;
     }
-    console.log('question results', results.rows);
     res.status(200).json(results.rows);
   })
 });
@@ -128,6 +111,22 @@ app.post('/answer/:id', checkJwt, (req, res) =>{
       }
       res.status(200).send();
     })
+});
+
+// delete question
+app.delete('/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+    pool.query('DELETE FROM answers WHERE ID = $1', [id], (error, results) => {
+      if(error){
+        throw error;
+      }
+    })
+    pool.query('DELETE FROM questions WHERE ID = $1', [id], (error, results) => {
+    if(error) {
+      throw error;
+    }
+    res.status(200).send();
+  })
 });
 
 // start server
