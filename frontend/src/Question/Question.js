@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import axios from 'axios';
+import {withRouter} from 'react-router-dom';
 import SubmitAnswer from './SubmitAnswer';
+import DeleteQuestion from './DeleteQuestion'
 import auth0Client from '../Auth';
 
 var renderAnswers = [];
@@ -13,6 +15,7 @@ class Question extends Component {
     };
 
     this.submitAnswer = this.submitAnswer.bind(this);
+    this.deleteQuestion = this.deleteQuestion.bind(this);
   }
 
   async componentDidMount() {
@@ -23,12 +26,10 @@ class Question extends Component {
     const { match: { params } } = this.props;
     const question = (await axios.get(`http://localhost:8081/${params.questionId}`)).data;
     const answers = (await axios.get(`http://localhost:8081/answer/${params.questionId}`)).data;
-    console.log('!@@$%%', answers);
-    renderAnswers = []
+    renderAnswers = [];
 ;    for(let attr of answers){
       renderAnswers.push(attr['answer_content']);
     }
-    console.log(renderAnswers);
     this.setState({
       question,
       answers
@@ -43,8 +44,14 @@ class Question extends Component {
     });
     await this.refreshQuestion();
   }
+
+  async deleteQuestion(){
+    await axios.delete(`http://localhost:8081/${this.state.question.id}`);
+    this.props.history.push('/');
+  }
+
   render() {
-    const {question, answers} = this.state;
+    const {question} = this.state;
     if (question === null) return <p>Loading ...</p>;
     return (
       <div className="container">
@@ -54,6 +61,7 @@ class Question extends Component {
             <p className="lead">{question.description}</p>
             <hr className="my-4" />
             <SubmitAnswer questionId={question.id} submitAnswer={this.submitAnswer} />
+            <DeleteQuestion deleteQuestion={this.deleteQuestion}/>
             <p>Answers:</p>
             {
               renderAnswers.map((answer, idx) => (
@@ -67,4 +75,4 @@ class Question extends Component {
   }
 }
 
-export default Question;
+export default withRouter(Question);
