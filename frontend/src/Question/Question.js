@@ -3,11 +3,13 @@ import axios from 'axios';
 import SubmitAnswer from './SubmitAnswer';
 import auth0Client from '../Auth';
 
+var renderAnswers = [];
 class Question extends Component {
   constructor(props) {
     super(props);
     this.state = {
       question: null,
+      answer: null,
     };
 
     this.submitAnswer = this.submitAnswer.bind(this);
@@ -20,8 +22,16 @@ class Question extends Component {
   async refreshQuestion() {
     const { match: { params } } = this.props;
     const question = (await axios.get(`http://localhost:8081/${params.questionId}`)).data;
+    const answers = (await axios.get(`http://localhost:8081/answer/${params.questionId}`)).data;
+    console.log('!@@$%%', answers);
+    renderAnswers = []
+;    for(let attr of answers){
+      renderAnswers.push(attr['answer_content']);
+    }
+    console.log(renderAnswers);
     this.setState({
       question,
+      answers
     });
   }
 
@@ -33,9 +43,8 @@ class Question extends Component {
     });
     await this.refreshQuestion();
   }
-
   render() {
-    const {question} = this.state;
+    const {question, answers} = this.state;
     if (question === null) return <p>Loading ...</p>;
     return (
       <div className="container">
@@ -47,8 +56,8 @@ class Question extends Component {
             <SubmitAnswer questionId={question.id} submitAnswer={this.submitAnswer} />
             <p>Answers:</p>
             {
-              question.answers.map((answer, idx) => (
-                <p className="lead" key={idx}>{answer.answer}</p>
+              renderAnswers.map((answer, idx) => (
+                <p className="lead" key={idx}>{answer}</p>
               ))
             }
           </div>
