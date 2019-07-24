@@ -6,6 +6,10 @@ const morgan = require('morgan');
 const jwt = require('express-jwt');
 const jwksRsa = require('jwks-rsa');
 
+
+//attempting to hook up postgres backend
+const Pool = require('pg').Pool;
+
 // express app
 const app = express();
 
@@ -24,27 +28,65 @@ app.use(cors());
 // log http reqs
 app.use(morgan('combined'));
 
+// db config
+const pool = new Pool({
+  user: 'madi.peters',
+  host: 'localhost',
+  database: 'qa_backend',
+  port: 5432,
+})
+
+// db setup
+  // create table questions (
+  //   ID SERIAL PRIMARY KEY,
+  // title VARCHAR(30),
+  // description VARCHAR(100),
+  // answers text[]
+  // );
+  // create table answers (
+  //   answer_id SERIAL PRIMARY KEY,
+  //   ID integer references questions,
+  //   answer_content text
+  // );
+  
+
 // retreive questions
 
 app.get('/', (req, res) => {
-    console.log('retreiving questions');
-    const qs = questions.map(q => ({
-        id: q.id,
-        title: q.title,
-        description: q.description,
-        answers: q.answers.length,
-    }));
-    res.send(qs);
+  pool.query('SELECT * FROM questions', (error, results) => {
+    if(error) {
+      throw error;
+    }
+    res.status(200).json(results.rows)
+  })
 });
 
 
 // get single question
 app.get('/:id', (req, res) => {
-    const question = questions.filter(q => (q.id === parseInt(req.params.id)));
-    if(question.length > 1) return res.status(500).send();
-    if (question.length === 0) return res.status(404).send();
-    res.send(question[0]);
+    const id = parseInt(req.params.id);
+    pool.query('SELECT * FROM questions WHERE ID = $1', [id], (error, results) => {
+    if(error) {
+      throw error;
+    }
+    console.log('results', results.rows[0]);
+    res.status(200).json(results.rows[0]);
+  })
 });
+
+// get answers for a specific question
+app.get('/answer/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  // AND answer_id = $2
+  pool.query('SELECT * FROM answers WHERE ID = $1', [id], (error, results) => {
+    if(error) {
+      throw error;
+    }
+    console.log('question results', results.rows);
+    res.status(200).json(results.rows);
+  })
+});
+
 
 // security through Auth0
 const checkJwt = jwt({
@@ -64,34 +106,29 @@ const checkJwt = jwt({
 
 // insert a new question
 app.post('/', checkJwt, (req, res) => {
-    console.log('posting question');
     const {title, description} = req.body;
-    const newQuestion = {
-        id: questions.length + 1,
-        title,
-        description,
-        answers: [],
-        author: req.user.name,
-    };
-    questions.push(newQuestion);
-    res.status(200).send();
+    let answers = '[]';
+    pool.query('INSERT INTO questions (title, description, answers) VALUES ($1, $2, $3)', [title, description, answers], (error, results) =>{
+      if (error) {
+        throw error;
+      }
+      res.status(200).send();
+    })
 });
 
+
 // insert a new answer to a question
-app.post('/answer/:id', checkJwt, (req, res) => {
+app.post('/answer/:id', checkJwt, (req, res) =>{
     const {answer} = req.body;
-  
-    const question = questions.filter(q => (q.id === parseInt(req.params.id)));
-    if (question.length > 1) return res.status(500).send();
-    if (question.length === 0) return res.status(404).send();
-  
-    question[0].answers.push({
-      answer,
-      author: req.user.name,
-    });
-  
-    res.status(200).send();
-  });
+    const id = parseInt(req.params.id);
+    // insert into db
+    pool.query('INSERT INTO answers (id, answer_content) VALUES ($1, $2)', [id, answer], (error, results) =>{
+      if (error) {
+        throw error;
+      }
+      res.status(200).send();
+    })
+});
 
 // start server
 app.listen(8081, () => {
