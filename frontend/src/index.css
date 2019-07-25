@@ -29,6 +29,13 @@ code {
   border: .2px solid grey;
 }
 
+
 .row {
-  width: 100%;
+  margin: 2vw;
+  padding-top: 1vw;
+  margin-left: -17vw;
+}
+.col-sm-12 {
+  margin-left: 2vw;
+  width: 40vw;
 }

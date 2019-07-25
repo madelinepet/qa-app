@@ -22,10 +22,10 @@ class Questions extends Component {
                 <div className="row">
                 <Link to="/new-question">
                     <div className="card text-white bg-success mb-3">
-                    <div className="card-header">Need help? Ask here!</div>
+                    <div className="card-header">Burning question?</div>
                     <div className="card-body">
                         <h4 className="card-title">+ New Question</h4>
-                        <p className="card-text">Don't worry. Help is on the way!</p>
+                        <p className="card-text">Ask away!</p>
                     </div>
                     </div>
           </Link>
