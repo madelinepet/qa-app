@@ -29,12 +29,11 @@ class SubmitAnswer extends Component {
     return (
       <Fragment>
         <div className="form-group text-center">
-          <label htmlFor="exampleInputEmail1">Answer:</label>
           <input
             type="text"
             onChange={(e) => {this.updateAnswer(e.target.value)}}
             className="form-control"
-            placeholder="Share your answer."
+            placeholder="Share your answer:"
             value={this.state.answer}
           />
         </div>

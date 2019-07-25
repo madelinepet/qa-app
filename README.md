@@ -15,7 +15,7 @@ Create two tables in your local Postgres database:
      ID SERIAL PRIMARY KEY,
    title VARCHAR(30),
    description VARCHAR(100),
-   answers text[]
+   answers integer
    );
 ```
 `answers`:   

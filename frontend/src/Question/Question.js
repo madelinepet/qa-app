@@ -61,14 +61,17 @@ class Question extends Component {
             <p className="lead">{question.description}</p>
             <hr className="my-4" />
             <SubmitAnswer questionId={question.id} submitAnswer={this.submitAnswer} />
-            <DeleteQuestion deleteQuestion={this.deleteQuestion}/>
             <p>Answers:</p>
             {
               renderAnswers.map((answer, idx) => (
                 <p className="lead" key={idx}>{answer}</p>
-              ))
-            }
+                ))
+              }
           </div>
+          <div className="delete">
+          <DeleteQuestion deleteQuestion={this.deleteQuestion}/>
+          </div>
+          
         </div>
       </div>
     )

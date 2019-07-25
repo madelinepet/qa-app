@@ -12,3 +12,23 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+.delete {
+  width: 100%;
+
+}
+
+.btn-secondary {
+  float: right;
+  background-color: red;
+  width: 100;
+}
+
+
+.form-control {
+  border: .2px solid grey;
+}
+
+.row {
+  width: 100%;
+}
