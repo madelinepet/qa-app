@@ -10,11 +10,6 @@ class DeleteQuestion extends Component {
     };
   }
 
-  // updateAnswer(value) {
-  //   this.setState({
-  //     answer: value,
-  //   });
-  // }
 
   submit() {
     this.props.deleteQuestion(this.state.answer);
@@ -31,11 +26,10 @@ class DeleteQuestion extends Component {
         <div className="form-group text-center">
         </div>
         <button
-          className="btn btn-primary"
+          className="btn btn-secondary"
           onClick={() => {this.submit()}}>
           Delete Question
         </button>
-        <hr className="my-4" />
       </Fragment>
     )
   }

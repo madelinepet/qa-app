@@ -2,26 +2,18 @@ import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
 import axios from 'axios';
 
-var answers = 0;
 class Questions extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
             questions: null,
-            // answers: null,
         };
     }
     async componentDidMount() {
-        // const { match: { params } } = this.props;
         const questions = (await axios.get('http://localhost:8081')).data;
-        // const answersArr = (await axios.get(`http://localhost:8081/answer/${params.questionId}`)).data;
-        // answers = answersArr.length;
-        // console.log(answers);
         this.setState({
             questions,
-            
-            // answers,
         });
     }
     render() {
@@ -43,7 +35,7 @@ class Questions extends Component {
                     <div key={question.id} className="col-sm-12 col-md-4 col-lg-3">
                         <Link to={`/question/${question.id}`}>
                         <div className="card text-white bg-success mb-3">
-                            <div className="card-header">Answers: {answers}</div>
+                            <div className="card-header">Answers: {question.answers}</div>
                             <div className="card-body">
                             <h4 className="card-title">{question.title}</h4>
                             <p className="card-text">{question.description}</p>

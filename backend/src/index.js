@@ -13,8 +13,6 @@ const Pool = require('pg').Pool;
 // express app
 const app = express();
 
-// mock database
-const questions = [];
 
 // use helmet to enhance app security
 app.use(helmet());
@@ -60,8 +58,8 @@ app.get('/:id', (req, res) => {
 
 // get answers for a specific question
 app.get('/answer/:id', (req, res) => {
+  console.log(req.params.id)
   const id = parseInt(req.params.id);
-  // AND answer_id = $2
   pool.query('SELECT * FROM answers WHERE ID = $1', [id], (error, results) => {
     if(error) {
       throw error;
@@ -90,7 +88,7 @@ const checkJwt = jwt({
 // insert a new question
 app.post('/', checkJwt, (req, res) => {
     const {title, description} = req.body;
-    let answers = '[]';
+    var answers = 0;
     pool.query('INSERT INTO questions (title, description, answers) VALUES ($1, $2, $3)', [title, description, answers], (error, results) =>{
       if (error) {
         throw error;
@@ -104,7 +102,23 @@ app.post('/', checkJwt, (req, res) => {
 app.post('/answer/:id', checkJwt, (req, res) =>{
     const {answer} = req.body;
     const id = parseInt(req.params.id);
-    // insert into db
+    var increment = 0;
+    // access number of answers for question
+    pool.query('SELECT answers FROM questions WHERE id = $1', [id], (error, results) =>{
+      if(error){
+        throw error;
+      }
+      increment = (results.rows[0]['answers']) + 1;
+      // update number of answers in questions table
+      pool.query(
+        'UPDATE questions SET answers = $1 WHERE id = $2', [increment, id], (error, results) => {
+          if (error) {
+            throw error;
+          }
+        });
+    });
+
+    // insert into db, note: id refers to the id on the questions table
     pool.query('INSERT INTO answers (id, answer_content) VALUES ($1, $2)', [id, answer], (error, results) =>{
       if (error) {
         throw error;
