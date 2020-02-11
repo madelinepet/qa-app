@@ -10,12 +10,18 @@ class Questions extends Component {
             questions: null,
         };
     }
+
     async componentDidMount() {
+        await this.refreshQuestions();
+    }
+    
+    async refreshQuestions(){
         const questions = (await axios.get('http://localhost:8081')).data;
         this.setState({
             questions,
         });
     }
+
     render() {
         return (
             <div className="container">

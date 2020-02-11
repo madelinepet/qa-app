@@ -2,20 +2,25 @@ import React, {Component} from 'react';
 import axios from 'axios';
 import {withRouter} from 'react-router-dom';
 import SubmitAnswer from './SubmitAnswer';
-import DeleteQuestion from './DeleteQuestion'
+import DeleteQuestion from './DeleteQuestion';
 import auth0Client from '../Auth';
 
+var answer_objs = {};
 var renderAnswers = [];
+
 class Question extends Component {
   constructor(props) {
     super(props);
     this.state = {
       question: null,
-      answer: null,
+      answerText: null,
+      answers: null
     };
 
     this.submitAnswer = this.submitAnswer.bind(this);
+    this.deleteAnswer = this.deleteAnswer.bind(this);
     this.deleteQuestion = this.deleteQuestion.bind(this);
+    this.deleteResponse = this.deleteResponse.bind(this);
   }
 
   async componentDidMount() {
@@ -27,7 +32,10 @@ class Question extends Component {
     const question = (await axios.get(`http://localhost:8081/${params.questionId}`)).data;
     const answers = (await axios.get(`http://localhost:8081/answer/${params.questionId}`)).data;
     renderAnswers = [];
-;    for(let attr of answers){
+    answer_objs = [];
+    for(let attr of answers){
+      var obj = {answer_content: attr['answer_content'], id: attr['answer_id']};
+      answer_objs.push(obj);
       renderAnswers.push(attr['answer_content']);
     }
     this.setState({
@@ -45,9 +53,26 @@ class Question extends Component {
     await this.refreshQuestion();
   }
 
+  async deleteAnswer(id) {
+    await axios.delete(`http://localhost:8081/answer/${id}`);
+    await this.refreshQuestion();
+  }
+
   async deleteQuestion(){
     await axios.delete(`http://localhost:8081/${this.state.question.id}`);
     this.props.history.push('/');
+  }
+
+  deleteResponse(event){
+    const texty = event.target.textContent.trim();
+    let id = '';
+    for(let i = 0; i < answer_objs.length; i++){
+      var answerContent = answer_objs[i]['answer_content'].trim();
+      if(answerContent === texty){
+        id = answer_objs[i]['id'];
+      }
+    }
+    this.deleteAnswer(id);
   }
 
   render() {
@@ -64,14 +89,15 @@ class Question extends Component {
             <p>Answers:</p>
             {
               renderAnswers.map((answer, idx) => (
-                <p className="lead" key={idx}>{answer}</p>
+                <div>
+                <p className="lead" onClick={this.deleteResponse} key={idx}>{answer} </p>
+                </div>
                 ))
               }
           </div>
           <div className="delete">
           <DeleteQuestion deleteQuestion={this.deleteQuestion}/>
           </div>
-          
         </div>
       </div>
     )

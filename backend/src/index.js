@@ -58,7 +58,6 @@ app.get('/:id', (req, res) => {
 
 // get answers for a specific question
 app.get('/answer/:id', (req, res) => {
-  console.log(req.params.id)
   const id = parseInt(req.params.id);
   pool.query('SELECT * FROM answers WHERE ID = $1', [id], (error, results) => {
     if(error) {
@@ -132,16 +131,58 @@ app.delete('/:id', (req, res) => {
   const id = parseInt(req.params.id);
     pool.query('DELETE FROM answers WHERE ID = $1', [id], (error, results) => {
       if(error){
-        throw error;
+        // throw error;
+        console.log(error)
       }
     })
     pool.query('DELETE FROM questions WHERE ID = $1', [id], (error, results) => {
     if(error) {
-      throw error;
+      // throw error;
+      console.log(error)
     }
     res.status(200).send();
   })
 });
+
+
+// delete answer
+app.delete('/answer/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  var questionId = 0;
+  var answersCount = 0;
+
+  pool.query('DELETE FROM answers WHERE answer_id = $1', [id], (error, results) => {
+    if(error){
+      console.log(error);
+    }
+    res.status(200).send();
+  })
+    // get question id from answers
+    pool.query('SELECT id FROM answers WHERE answer_id = $1', [id], (error, results) => {
+      if(error) {
+        console.log(error);
+      }
+      console.log('id', id)
+      questionId = results.rows[0]['id'];
+      console.log('Questionid:', questionId)
+      // count how many answers for this question id
+      pool.query('SELECT COUNT(*) FROM answers WHERE id = $1', [questionId], (error, results) => {
+          if (error) {
+            throw error;
+          }
+          answersCount = results.rows[0]['count'];
+          console.log(answersCount);
+          // update questions answer count to correspond
+          pool.query(
+              'UPDATE questions SET answers = $1 WHERE id = $2', [answersCount, questionId], (error, results) => {
+              if (error) {
+                throw error;
+              }
+              // console.log('results', results.rows);
+            })
+        })
+    });
+  });
 
 // start server
 app.listen(8081, () => {
