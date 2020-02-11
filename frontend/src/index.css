@@ -24,11 +24,24 @@ code {
   width: 100;
 }
 
+.btn-delete {
+  float: left;
+  background-color: red;
+  width: 20;
+}
 
 .form-control {
   border: .2px solid grey;
 }
 
+
 .row {
-  width: 100%;
+  margin: 2vw;
+  padding-top: 1vw;
+  margin-left: 0vw;
+}
+
+.col-sm-12 {
+  margin-left: 2vw;
+  width: 40vw;
 }

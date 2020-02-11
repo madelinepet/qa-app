@@ -38,6 +38,7 @@ class App extends Component {
           <NavBar/>
           <Route exact path='/' component={Questions}/>
           <Route exact path='/question/:questionId' component={Question}/>
+          {/* <Route exact path='/answer/:id' component={}/> */}
           <Route exact path='/callback' component={Callback}/>
           <SecuredRoute path='/new-question'
                   component={NewQuestion}
