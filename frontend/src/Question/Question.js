@@ -29,8 +29,9 @@ class Question extends Component {
 
   async refreshQuestion() {
     const { match: { params } } = this.props;
-    const question = (await axios.get(`http://localhost:8081/${params.questionId}`)).data;
-    const answers = (await axios.get(`http://localhost:8081/answer/${params.questionId}`)).data;
+    const question = (await axios.get(`http://localhost:5000/${params.questionId}`)).data;
+    // console.log('question', question)
+    const answers = (await axios.get(`http://localhost:5000/answer/${params.questionId}`)).data;
     renderAnswers = [];
     answer_objs = [];
     for(let attr of answers){
@@ -45,21 +46,23 @@ class Question extends Component {
   }
 
   async submitAnswer(answer) {
-    await axios.post(`http://localhost:8081/answer/${this.state.question.id}`, {
+    const { match: { params } } = this.props;
+    await axios.post(`http://localhost:5000/answer/${params.questionId}`, {
       answer,
     }, {
-      headers: { 'Authorization': `Bearer ${auth0Client.getIdToken()}` }
+      headers: { 'Authorization': `Bearer ${auth0Client.getIdToken()}`}
     });
     await this.refreshQuestion();
   }
 
   async deleteAnswer(id) {
-    await axios.delete(`http://localhost:8081/answer/${id}`);
+    await axios.delete(`http://localhost:5000/answer/${id}`);
     await this.refreshQuestion();
   }
 
   async deleteQuestion(){
-    await axios.delete(`http://localhost:8081/${this.state.question.id}`);
+    const { match: { params } } = this.props;
+    await axios.delete(`http://localhost:5000/${params.questionId}`);
     this.props.history.push('/');
   }
 
@@ -77,13 +80,14 @@ class Question extends Component {
 
   render() {
     const {question} = this.state;
+    // console.log(question)
     if (question === null) return <p>Loading ...</p>;
     return (
       <div className="container">
         <div className="row">
           <div className="jumbotron col-12">
-            <h1 className="display-3">{question.title}</h1>
-            <p className="lead">{question.description}</p>
+            <h1 className="display-3">{question[0].title}</h1>
+            <p className="lead">{question[0].description}</p>
             <hr className="my-4" />
             <SubmitAnswer questionId={question.id} submitAnswer={this.submitAnswer} />
             <p>Answers:</p>
